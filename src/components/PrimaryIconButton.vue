@@ -31,7 +31,7 @@ const props = withDefaults(
 }
 
 .primary-icon-button:active {
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.6) !important;
     color: #000;
     transition: 0s;
 }

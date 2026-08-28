@@ -216,7 +216,7 @@ onMounted(() => {
                     <TransparentIconButton :icon="skipPreviousIcon" style="margin-left: auto;" @click="prevTrack()">
                     </TransparentIconButton>
                     <PrimaryIconButton :icon="playStatus.paused ? playArrowIcon : pauseIcon" style="margin: 0 8px;"
-                        @click="playPause()"></PrimaryIconButton>
+                        class="btn-play" @click="playPause()"></PrimaryIconButton>
                     <TransparentIconButton :icon="skipNextIcon" @click="nextTrack()"></TransparentIconButton>
 
                     <TransparentIconButton :icon="queueMusicIcon" style="margin-left: auto;" @click="hideQueue = false">
@@ -327,9 +327,17 @@ onMounted(() => {
     filter: invert(1);
 }
 
+.body-theme-dark .btn-play {
+    background: var(--indigo-400);
+}
+
 @media(prefers-color-scheme: dark) {
     .body-theme-system .volume-area img {
         filter: invert(1);
+    }
+
+    .body-theme-system .btn-play {
+        background: var(--indigo-400);
     }
 }
 </style>
