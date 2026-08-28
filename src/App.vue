@@ -110,6 +110,7 @@ provide('registerMethod', registerMethod)
   align-items: center;
   justify-content: center;
   background: var(--indigo-400);
+  color: #fff;
   display: none;
 }
 
