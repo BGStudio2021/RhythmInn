@@ -7,7 +7,6 @@ import Toast from './components/Toast.vue'
 import type { Track, Queue } from './components/types.ts'
 import playlistDataArtists from './assets/playlist-artists.json'
 import playlistDataSongs from './assets/playlist-songs.json'
-import { settings } from './components/settings.ts'
 
 // 初始化播放列表
 const playlistArtists = ref(playlistDataArtists)
@@ -68,13 +67,6 @@ provide('registerMethod', registerMethod)
       <Playing v-model:queue="queue" />
     </div>
   </div>
-
-  <!-- 移动端适配提示 -->
-  <Teleport to="body">
-    <div class="mobile-screen-unsupported">暂未适配你的屏幕尺寸。</div>
-  </Teleport>
-  <!-- 移动端适配提示 -->
-
 </template>
 <style scoped>
 .container {
@@ -98,27 +90,5 @@ provide('registerMethod', registerMethod)
 .playing {
   position: relative;
   width: 30%;
-}
-
-/* 移动端适配提示 */
-.mobile-screen-unsupported {
-  position: fixed;
-  z-index: 114514;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--indigo-400);
-  color: #fff;
-  display: none;
-}
-
-@media screen and (max-width:720px) {
-  .mobile-screen-unsupported {
-    display: flex;
-  }
 }
 </style>
