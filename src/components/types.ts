@@ -6,6 +6,14 @@ export interface Track {
     album: { name: string, id: number, cover: string },
     duration: number
 }
+
+// 作责
+export interface Artist {
+    name: string,
+    id: number | string,
+    tracks: Track[]
+}
+
 // 播放队列
 export interface Queue {
     queue: Track[],

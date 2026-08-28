@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject } from 'vue';
+import { inject } from 'vue'
 import clearIcon from '../assets/icons/clear.svg'
 import type { Track, Queue } from './types.ts'
 

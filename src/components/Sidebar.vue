@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import RhythmInnTitle from '../assets/RhythmInn-Title.png'
+import RhythmInnTitle from '/RhythmInn-Title.png'
 import searchIcon from '../assets/icons/search.svg'
 import SidebarItem from './SidebarItem.vue'
 import musicNoteIcon from "../assets/icons/music_note.svg"
 import personIcon from '../assets/icons/person.svg'
-import { onMounted, ref } from 'vue'
-import playlistDataArtists from '../assets/playlist-artists.json'
-import playlistDataSongs from '../assets/playlist-songs.json'
+import { onMounted } from 'vue'
+import type { Track, Artist } from './types.ts'
 import settingsIcon from '../assets/icons/settings.svg'
 
-// 初始化播放列表
-const playlistArtists = ref(playlistDataArtists)
-const playlistSongs = ref(playlistDataSongs)
+const props = defineProps<{
+    playlistSongs: Track[],
+    playlistArtists: Artist[]
+}>()
+
 // 选项卡
 const currentTab = defineModel('currentTab')
 function openTab(tab: string, title: string, subtitle?: string) {
@@ -19,21 +20,17 @@ function openTab(tab: string, title: string, subtitle?: string) {
     playlistTitle.value = title
     playlistSubtitle.value = subtitle
 }
-// 绑定启动画面显示状态
-const hideSplash = defineModel('hideSplash')
+
 // 绑定播放列表标题、副标题
 const playlistTitle = defineModel('playlistTitle')
 const playlistSubtitle = defineModel('playlistSubtitle')
+
 // 绑定当前打开的播放列表
 const currentPlaylist = defineModel('currentPlaylist')
 
 onMounted(() => {
-    // 加载完成后自动隐藏启动画面
-    setTimeout(() => {
-        hideSplash.value = true
-    }, 100)
-    openTab('all', '全部音乐', `${playlistSongs.value.length} 首音乐`)
-    currentPlaylist.value = playlistSongs.value
+    openTab('all', '全部音乐', `${props.playlistSongs.length} 首音乐`)
+    currentPlaylist.value = props.playlistSongs
 })
 </script>
 <template>

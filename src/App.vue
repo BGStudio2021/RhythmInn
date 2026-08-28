@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import Splash from './components/Splash.vue'
 import Sidebar from './components/Sidebar.vue'
 import { provide, ref } from 'vue'
 import Playlist from './components/Playlist.vue'
 import Playing from './components/Playing.vue'
 import Toast from './components/Toast.vue'
 import type { Track, Queue } from './components/types.ts'
+import playlistDataArtists from './assets/playlist-artists.json'
+import playlistDataSongs from './assets/playlist-songs.json'
 import { settings } from './components/settings.ts'
 
-const hideSplash = ref(false)
+// 初始化播放列表
+const playlistArtists = ref(playlistDataArtists)
+const playlistSongs = ref(playlistDataSongs)
 const playlistTitle = ref('')
 const playlistSubtitle = ref('')
 const currentPlaylist = ref()
@@ -51,12 +54,11 @@ provide('registerMethod', registerMethod)
 </script>
 <template>
   <Toast ref="toastRef"></Toast>
-  <Splash v-model="hideSplash" />
   <div class="container">
     <div class="sidebar">
-      <Sidebar v-model:hide-splash="hideSplash" v-model:playlist-title="playlistTitle"
-        v-model:playlist-subtitle="playlistSubtitle" v-model:current-playlist="currentPlaylist"
-        v-model:current-tab="currentTab" />
+      <Sidebar v-model:playlist-title="playlistTitle" v-model:playlist-subtitle="playlistSubtitle"
+        v-model:current-playlist="currentPlaylist" v-model:current-tab="currentTab" :playlist-songs="playlistSongs"
+        :playlist-artists="playlistArtists" />
     </div>
     <div class="playlist">
       <Playlist v-model:title="playlistTitle" v-model:subtitle="playlistSubtitle" v-model:playlist="currentPlaylist"
