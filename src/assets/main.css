@@ -1,0 +1,98 @@
+:root {
+  /* 主题色 */
+  --indigo-50: #E8EAF6;
+  --indigo-100: #C5CAE9;
+  --indigo-200: #9FA8DA;
+  --indigo-300: #7986CB;
+  --indigo-400: #5C6BC0;
+  --indigo-500: #3F51B5;
+  --indigo-600: #3949AB;
+  --indigo-700: #303F9F;
+  --indigo-800: #283593;
+  --indigo-900: #1A237E;
+  /* 主题色统一 */
+  --indigo-background: var(--indigo-50);
+  --indigo-primary: var(--indigo-400);
+  --indigo-text: var(--indigo-500);
+  /* 动态主题色（浅色下为 indigo，深色下为灰色） */
+  --indigo-primary-dynamic: var(--indigo-400);
+  /* 反馈叠加色 */
+  --hover-dark: rgba(0, 0, 0, 0.1);
+  --active-dark: rgba(0, 0, 0, 0.2);
+  --active-darker: rgba(0, 0, 0, 0.3);
+  --hover-dark-dynamic: rgba(0, 0, 0, 0.1);
+  --active-dark-dynamic: rgba(0, 0, 0, 0.2);
+  --active-darker-dynamic: rgba(0, 0, 0, 0.3);
+  --hover-light: rgba(255, 255, 255, 0.15);
+  --active-light: rgba(255, 255, 255, 0.3);
+  --hover-light-dynamic: rgba(255, 255, 255, 0.15);
+  --active-light-dynamic: rgba(255, 255, 255, 0.3);
+  /* 滚动条颜色 */
+  --scrollbar-light: rgba(255, 255, 255, 0.25);
+  --scrollbar-light-hover: rgba(255, 255, 255, 0.35);
+  --scrollbar-light-active: rgba(255, 255, 255, 0.45);
+  /* 边框颜色 */
+  --border-dark: rgba(0, 0, 0, 0.6);
+  --border-dark-dynamic: rgba(0, 0, 0, 0.6);
+  /* 速度曲线 */
+  --easeOutCirc: cubic-bezier(0.075, 0.820, 0.165, 1.000);
+}
+
+/* 深色主题 */
+
+.body-theme-dark {
+  /* 主题色统一 */
+  --indigo-background: #1e1f20;
+  --indigo-primary: var(--indigo-500);
+  --indigo-text: var(--indigo-300);
+  /* 动态主题色（浅色下为 indigo，深色下为灰色） */
+  --indigo-primary-dynamic: #333;
+  /* 反馈叠加色 */
+  --hover-dark-dynamic: rgba(255, 255, 255, 0.1);
+  --active-dark-dynamic: rgba(255, 255, 255, 0.2);
+  --active-darker-dynamic: rgba(255, 255, 255, 0.3);
+  --hover-light-dynamic: rgba(0, 0, 0, 0.15);
+  --active-light-dynamic: rgba(0, 0, 0, 0.3);
+  /* 边框颜色 */
+  --border-dark-dynamic: rgba(255, 255, 255, 0.6);
+
+  color: #fff;
+}
+
+@media(prefers-color-scheme: dark) {
+  .body-theme-system {
+    /* 主题色统一 */
+    --indigo-background: #1e1f20;
+    --indigo-primary: var(--indigo-500);
+    --indigo-text: var(--indigo-300);
+    /* 动态主题色（浅色下为 indigo，深色下为灰色） */
+    --indigo-primary-dynamic: #333;
+    /* 反馈叠加色 */
+    --hover-dark-dynamic: rgba(255, 255, 255, 0.1);
+    --active-dark-dynamic: rgba(255, 255, 255, 0.2);
+    --active-darker-dynamic: rgba(255, 255, 255, 0.3);
+    --hover-light-dynamic: rgba(0, 0, 0, 0.15);
+    --active-light-dynamic: rgba(0, 0, 0, 0.3);
+    /* 边框颜色 */
+    --border-dark-dynamic: rgba(255, 255, 255, 0.6);
+
+    color: #fff;
+  }
+}
+
+* {
+  user-select: none;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI Variable", "Segoe UI", "Microsoft YaHei UI", "微软雅黑", sans-serif;
+  background: var(--indigo-background);
+  overflow: hidden;
+}
+
+img {
+  -webkit-user-drag: none;
+}

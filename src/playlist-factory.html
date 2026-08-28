@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>播放列表整理工具</title>
+    <style>
+        html,
+        body {
+            background: #333;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    请在控制台中复制处理好的播放列表。
+    <br>
+    Made by Burger Studio.
+    <script>
+        let playlist;
+        let artists_all = [];
+        let songs_all = [];
+        let artists_classified = [{ name: '其他作者', id: 'others', tracks: [] }];
+        fetch('assets/playlist.json').then((response) => response.json())
+            .then((data) => {
+                playlist = data.playlist.tracks;
+                // 按作者整理：
+                data.playlist.tracks.forEach(track => {
+                    track.ar.forEach((ar) => {
+                        const artist = artists_all.find((artist) => artist.name === ar.name); // 因部分作者旧账号 ID 变为 0 ，故使用名称进行匹配
+                        if (artist) {
+                            // 向已有作者添加作品
+                            artist.tracks.push({ name: track.name, id: track.id, artists: track.ar.map(({ name, id }) => ({ name, id })), album: { name: track.al.name, id: track.al.id, cover: track.al.picUrl }, duration: track.dt });
+                        } else {
+                            // 新建新作者和作品
+                            artists_all.push({ name: ar.name, id: ar.id, tracks: [{ name: track.name, id: track.id, artists: track.ar.map(({ name, id }) => ({ name, id })), album: { name: track.al.name, id: track.al.id, cover: track.al.picUrl }, duration: track.dt }] });
+                        }
+                    });
+                });
+                // 第一次排序（按字母顺序）
+                artists_all.sort((a, b) => a.name.localeCompare(b.name, 'zh-CN'));
+                // 第二次排序（按作品数量）
+                artists_all.sort((a, b) => b.tracks.length - a.tracks.length);
+                // 整理作者（把只包含一首作品的作者归类）
+                artists_all.forEach((artist) => {
+                    if (artist.tracks.length === 1) {
+                        // 先查找，避免重复添加
+                        const track = artists_classified[0].tracks.find((track) => track.id === artist.tracks[0].id);
+                        if (!track) {
+                            artists_classified[0].tracks.push(artist.tracks[0]);
+                        }
+                    } else {
+                        artists_classified.push(artist);
+                    }
+                });
+                // 第三次排序（各作者作品按字母顺序排序）
+                artists_classified.forEach((artist) => {
+                    artist.tracks.sort((a, b) => a.name.localeCompare(b.name, 'zh-CN'));
+                });
+                console.log('以下为按作者整理：')
+                console.log(artists_classified)
+                // 所有音乐（按添加时间排序）：
+                playlist.forEach((track) => {
+                    songs_all.push({ name: track.name, id: track.id, artists: track.ar.map(({ name, id }) => ({ name, id })), album: { name: track.al.name, id: track.al.id, cover: track.al.picUrl }, duration: track.dt });
+                });
+                console.log('以下为所有音乐（按添加时间排序）：')
+                console.log(songs_all)
+            });
+    </script>
+</body>
+
+</html>
