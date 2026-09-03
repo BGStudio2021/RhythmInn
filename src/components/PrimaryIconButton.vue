@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const props = withDefaults(
     defineProps<{
-        icon: string,
+        icon?: string,
         iconSize?: string
     }>(),
     {
@@ -11,7 +11,8 @@ const props = withDefaults(
 </script>
 <template>
     <button class="primary-icon-button" :class="{ 'primary-icon-button-small': iconSize === 'small' }">
-        <img :src="icon">
+        <img :src="icon" v-if="icon">
+        <slot></slot>
     </button>
 </template>
 <style scoped>
@@ -22,12 +23,14 @@ const props = withDefaults(
     border: none;
     outline: none;
     background: var(--indigo-primary);
+    color: #fff;
     padding: 6px;
 }
 
 .primary-icon-button:hover {
     outline: 2px solid var(--border-dark-dynamic);
-    transition: background 1s var(--easeOutCirc);
+    transition: background 1s var(--easeOutCirc),
+        color 1s var(--easeOutCirc);
 }
 
 .primary-icon-button:active {

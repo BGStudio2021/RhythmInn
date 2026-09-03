@@ -46,7 +46,7 @@ onMounted(() => {
             <img :src="favicon" class="project-icon">
             <div class="project-name-and-version">
                 <div class="project-name">拾音栈 - RhythmInn</div>
-                <div class="project-version">Version 1.0.0</div>
+                <div class="project-version">Version 1.1.0</div>
             </div>
         </div>
         <div style="margin-top: 16px;">本项目基于 MIT 许可证开源。 </div>

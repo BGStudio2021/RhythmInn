@@ -3,7 +3,7 @@ import TrackComponent from './Track.vue'
 import TabTransition from './TabTransition.vue'
 import Input from './Input.vue'
 import searchIcon from '../assets/icons/search.svg'
-import { inject, nextTick, ref, watch } from 'vue'
+import { computed, inject, nextTick, ref, watch } from 'vue'
 import playlistDataSongs from '../assets/playlist-songs.json'
 import playArrowIcon from '../assets/icons/play_arrow.svg'
 import type { Queue, Track } from './types.ts'
@@ -11,6 +11,7 @@ import PrimaryIconButton from './PrimaryIconButton.vue'
 import SecondaryIconButton from './SecondaryIconButton.vue'
 import myLocationIcon from '../assets/icons/my_location.svg'
 import Settings from './Settings.vue'
+import Pagination from './Pagination.vue'
 
 const props = defineProps<{
     currentTab: string
@@ -23,8 +24,32 @@ const playlist = defineModel<Track[]>('playlist')
 const searchKeywords = defineModel({ default: '' })
 const queue = defineModel<Queue>('queue')
 const SearchBar = ref()
+const contentAreaRef = ref()
 const showToast = inject<(msg: string) => void>('showToast')
 const locateBtnDisabled = ref(true) // 定位按钮禁用状态
+// 页码按钮显示状态
+const paginationVisible = computed(() => {
+    if (props.currentTab.indexOf('all') !== -1 || props.currentTab.indexOf('artist') !== -1) {
+        if (playlist.value && playlist.value.length > 100) {
+            return true
+        } else {
+            return false
+        }
+    } else {
+        return false
+    }
+})
+const currentPage = ref(1)
+// 当前页播放列表切片
+const playlistSlice = computed(() => {
+    if (playlist.value && playlist.value.length > 100) {
+        const start = 100 * (currentPage.value - 1)
+        const end = Math.min(100 * currentPage.value, playlist.value.length)
+        return playlist.value.slice(start, end)
+    } else {
+        return playlist.value
+    }
+})
 
 // 自动聚焦搜索框
 watch(() => props.currentTab, async () => {
@@ -69,10 +94,17 @@ function playAll() {
 
 // 定位到曲目
 function scrollToPlaylistTrack(track: Track) {
-    const target = document.querySelector(`[playlist-track-id='${track.id}']`)
-    if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    // 存在分页时自动跳转到所在页面
+    if (playlist.value && playlist.value.length > 100) {
+        const index = playlist.value.findIndex((_track: Track) => _track.id === track.id)
+        currentPage.value = Math.ceil((index + 1) / 100)
     }
+    setTimeout(() => {
+        const target = document.querySelector(`[playlist-track-id='${track.id}']`)
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+    })
 }
 
 // 定位到当前曲目
@@ -81,6 +113,15 @@ function scrollToCurrentTrack() {
     if (currentTrack) {
         scrollToPlaylistTrack(currentTrack)
     }
+}
+
+// 滚动到播放列表顶部
+function scrollToTop() {
+    const contentArea = contentAreaRef.value
+    contentArea.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    })
 }
 
 // 更新定位按钮禁用状态
@@ -97,11 +138,16 @@ function updateLocateBtn() {
 }
 
 watch(() => playlist.value, () => {
+    currentPage.value = 1 // 播放列表变化时，将页码复原
     updateLocateBtn()
 })
 
 watch(() => queue.value?.current, () => {
     updateLocateBtn()
+})
+
+watch(() => currentPage.value, () => {
+    scrollToTop() // 翻页时自动滚动到顶部
 })
 </script>
 <template>
@@ -124,14 +170,15 @@ watch(() => queue.value?.current, () => {
                 <div style="width: 100%;height: 16px;" v-if="subtitle"></div>
                 <Input v-model="searchKeywords" v-if="currentTab === 'search'" style="width: 100%;"
                     :placeholder="'音乐标题 / 作者 / 专辑'" :icon="searchIcon" ref="SearchBar" />
+                <Pagination v-if="paginationVisible" v-model:playlist="playlist" v-model:current-page="currentPage" />
             </div>
-            <div class="content-area">
+            <div class="content-area" ref="contentAreaRef">
                 <div v-if="currentTab === 'settings'">
                     <Settings />
                 </div>
                 <div v-if="currentTab !== 'settings'">
                     <div class="playlist">
-                        <TrackComponent v-for="(track, index) in playlist" :number="index + 1" :info="track"
+                        <TrackComponent v-for="(track, index) in playlistSlice" :number="index + 1" :info="track"
                             v-model:queue="queue" :playlist-track-id="track.id" />
                     </div>
                 </div>

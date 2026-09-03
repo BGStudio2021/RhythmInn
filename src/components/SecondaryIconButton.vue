@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const props = withDefaults(
     defineProps<{
-        icon: string,
+        icon?: string,
         iconSize?: string
     }>(),
     {
@@ -11,7 +11,8 @@ const props = withDefaults(
 </script>
 <template>
     <button class="secondary-icon-button" :class="{ 'secondary-icon-button-small': iconSize === 'small' }">
-        <img :src="icon">
+        <img :src="icon" v-if="icon">
+        <slot></slot>
     </button>
 </template>
 <style scoped>
@@ -27,7 +28,8 @@ const props = withDefaults(
 
 .secondary-icon-button:hover {
     outline: 2px solid var(--border-dark-dynamic);
-    transition: background 1s var(--easeOutCirc);
+    transition: background 1s var(--easeOutCirc),
+        color 1s var(--easeOutCirc);
 }
 
 .secondary-icon-button:active {
@@ -66,6 +68,7 @@ const props = withDefaults(
 
 .body-theme-dark .secondary-icon-button {
     background: rgba(255, 255, 255, 0.2);
+    color: #fff;
 }
 
 .body-theme-dark .secondary-icon-button:active {
@@ -83,6 +86,7 @@ const props = withDefaults(
 @media(prefers-color-scheme: dark) {
     .body-theme-system .secondary-icon-button {
         background: rgba(255, 255, 255, 0.2);
+        color: #fff;
     }
 
     .body-theme-system .secondary-icon-button:active {
