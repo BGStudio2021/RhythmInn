@@ -1,10 +1,15 @@
 <script setup lang="ts">
+import { useTouchOptimize } from './touchOptimize.ts'
+const { pressed: touchPressed, press: touchPress, lift: touchLift } = useTouchOptimize()
+
 const props = defineProps<{
     icon?: string
 }>()
 </script>
 <template>
-    <button class="primary-button" :class="{ 'primary-button-with-icon': icon }">
+    <button class="primary-button"
+        :class="{ 'primary-button-with-icon': icon, 'primary-button-active': touchPressed === 1 }"
+        @touchstart="touchPress(1)" @touchend="touchLift()">
         <img :src="icon" v-if="icon" class="primary-button-icon">
         <slot></slot>
     </button>
@@ -31,10 +36,12 @@ const props = defineProps<{
     transition-timing-function: var(--easeOutCirc);
 }
 
-.primary-button:active {
+.primary-button:active,
+.primary-button-active {
+    outline: 2px solid var(--border-dark-dynamic);
     background: rgba(255, 255, 255, 0.6);
     color: #000;
-    transition: 0s;
+    transition: 0s !important;
 }
 
 .primary-button-with-icon {
@@ -50,7 +57,7 @@ const props = defineProps<{
 }
 
 .primary-button:active .primary-button-icon {
-    transition: 0s;
+    transition: 0s !important;
     filter: none;
 }
 

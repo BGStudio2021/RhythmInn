@@ -1,4 +1,8 @@
-<script setup lang="ts">const props = defineProps<{
+<script setup lang="ts">
+import { useTouchOptimize } from './touchOptimize.ts'
+const { pressed: touchPressed, press: touchPress, lift: touchLift } = useTouchOptimize()
+
+const props = defineProps<{
     name: string,
     options: {
         value: string,
@@ -11,7 +15,9 @@ const selected = defineModel()
 <template>
     <div class="horizontal-select">
         <label class="horizontal-select-option" v-for="option in options" :for="option.value"
-            :class="{ 'horizontal-select-option-selected': selected === option.value }">{{ option.label }}</label>
+            :class="{ 'horizontal-select-option-selected': selected === option.value, 'horizontal-select-option-active': touchPressed === option.value }"
+            @touchstart="touchPress(option.value)" @touchend="touchLift()">{{
+                option.label }}</label>
         <input type="radio" :name="name" v-for="option in options" :value="option.value" :id="option.value"
             style="display: none;" v-model="selected">
     </div>
@@ -34,7 +40,8 @@ const selected = defineModel()
     background: var(--hover-dark-dynamic);
 }
 
-.horizontal-select-option:active {
+.horizontal-select-option:active,
+.horizontal-select-option-active {
     background: var(--active-dark-dynamic);
 }
 

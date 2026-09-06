@@ -44,6 +44,8 @@ defineExpose({ show })
     opacity: 0;
     pointer-events: none;
     transform: translateX(16px);
+    white-space: pre-line;
+    line-height: 1.5;
 }
 
 .toast-visible {
@@ -53,6 +55,7 @@ defineExpose({ show })
 }
 
 /* 深色主题 */
+
 .body-theme-dark .toast {
     border: 2px solid var(--indigo-200);
 }

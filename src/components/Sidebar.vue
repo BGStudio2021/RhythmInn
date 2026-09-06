@@ -21,12 +21,18 @@ function openTab(tab: string, title: string, subtitle?: string) {
     playlistSubtitle.value = subtitle
 }
 
+// 移动选项卡
+const currentMobileTab = defineModel('currentMobileTab')
+
 // 绑定播放列表标题、副标题
 const playlistTitle = defineModel('playlistTitle')
 const playlistSubtitle = defineModel('playlistSubtitle')
 
 // 绑定当前打开的播放列表
 const currentPlaylist = defineModel('currentPlaylist')
+
+// 搜索框聚焦状态标记（只要数值变化就聚焦）
+const searchBarFocusMark = defineModel('searchBarFocusMark')
 
 onMounted(() => {
     openTab('all', '全部音乐', `${props.playlistSongs.length} 首音乐`)
@@ -38,18 +44,21 @@ onMounted(() => {
         <img :src="RhythmInnTitle" alt="RhythmInn-Title">
     </div>
     <SidebarItem :icon="searchIcon" :active="currentTab === 'search'"
-        @click="openTab('search', '搜索', '搜索音乐'); currentPlaylist = []">搜索
+        @click="openTab('search', '搜索', '搜索音乐'); currentPlaylist = []; currentMobileTab = 'playlist'; searchBarFocusMark = !searchBarFocusMark">
+        搜索
     </SidebarItem>
     <SidebarItem :icon="musicNoteIcon" :active="currentTab === 'all'"
-        @click="openTab('all', '全部音乐', `${playlistSongs.length} 首音乐`); currentPlaylist = playlistSongs">全部音乐
+        @click="openTab('all', '全部音乐', `${playlistSongs.length} 首音乐`); currentPlaylist = playlistSongs; currentMobileTab = 'playlist'">
+        全部音乐
     </SidebarItem>
-    <SidebarItem :icon="settingsIcon" :active="currentTab === 'settings'" @click="openTab('settings', '设置')">设置
+    <SidebarItem :icon="settingsIcon" :active="currentTab === 'settings'"
+        @click="openTab('settings', '设置'); currentMobileTab = 'playlist'">设置
     </SidebarItem>
     <div class="sidebar-subtitle">按作者整理</div>
     <div class="sidebar-scroll-area">
         <SidebarItem :icon="personIcon" v-for="artist in playlistArtists" style="margin-right: 0;"
             :active="currentTab === `artist_${artist.id}`"
-            @click="openTab(`artist_${artist.id}`, artist.name, `${artist.tracks.length} 首音乐`); currentPlaylist = artist.tracks">
+            @click="openTab(`artist_${artist.id}`, artist.name, `${artist.tracks.length} 首音乐`); currentPlaylist = artist.tracks; currentMobileTab = 'playlist'">
             {{
                 artist.name }}
         </SidebarItem>
@@ -94,5 +103,12 @@ onMounted(() => {
 
 .sidebar-scroll-area::-webkit-scrollbar-thumb:active {
     background: var(--scrollbar-light-active);
+}
+
+@media screen and (max-width:720px) {
+    .title-area img {
+        width: 40%;
+        margin: 12px 0 8px 0;
+    }
 }
 </style>

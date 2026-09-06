@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { useTouchOptimize } from './touchOptimize.ts'
+const { pressed: touchPressed, press: touchPress, lift: touchLift } = useTouchOptimize()
+
 const props = withDefaults(
     defineProps<{
         icon?: string,
@@ -10,7 +13,9 @@ const props = withDefaults(
 )
 </script>
 <template>
-    <button class="primary-icon-button" :class="{ 'primary-icon-button-small': iconSize === 'small' }">
+    <button class="primary-icon-button"
+        :class="{ 'primary-icon-button-small': iconSize === 'small', 'primary-icon-button-active': touchPressed === 1 }"
+        @touchstart="touchPress(1)" @touchend="touchLift()">
         <img :src="icon" v-if="icon">
         <slot></slot>
     </button>
@@ -33,10 +38,12 @@ const props = withDefaults(
         color 1s var(--easeOutCirc);
 }
 
-.primary-icon-button:active {
+.primary-icon-button:active,
+.primary-icon-button-active {
+    outline: 2px solid var(--border-dark-dynamic);
     background: rgba(255, 255, 255, 0.6) !important;
     color: #000;
-    transition: 0s;
+    transition: 0s !important;
 }
 
 .primary-icon-button-small {
@@ -56,9 +63,10 @@ const props = withDefaults(
     height: 24px;
 }
 
-.primary-icon-button:active img {
+.primary-icon-button:active img,
+.primary-icon-button-active img {
     filter: none;
-    transition: 0s;
+    transition: 0s !important;
 }
 
 .primary-icon-button:disabled {

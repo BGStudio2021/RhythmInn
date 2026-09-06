@@ -9,36 +9,71 @@ import FloatDialog from './FloatDialog..vue'
 import PrimaryButton from './PrimaryButton.vue'
 import SecondaryButton from './SecondaryButton.vue'
 import UniversalOverlay from './UniversalOverlay.vue'
+import { useTouchOptimize } from './touchOptimize.ts'
+const { pressed: touchPressed, press: touchPress, lift: touchLift } = useTouchOptimize()
 
 const hidden = defineModel<boolean>('hidden', { default: true })
+const fullyOpen = ref(false) // 记录播放队列是否完全打开（动画播放完毕）
 const queue = defineModel<Queue>('queue')
 const registerMethod = inject<(name: string, fn: Function) => void>('registerMethod')
 const floatDialogOpen_clearQueue = ref(false)
+const currentMobileTab = defineModel('currentMobileTab') // 移动选项卡
+const manualSwitch = ref(false)
 
 // 定位到指定曲目
+// 进行定位时必须满足以下条件，避免滚动溢出：
+// 1. 播放队列处于完全打开状态
+// 2. 若为移动端，则当前选项卡必须为 playing
 async function scrollToQueueTrack(track: Track) {
     await nextTick()
     const target = document.querySelector(`[queue-track-id='${track.id}']`)
-    if (target && !hidden.value) { // 只有播放队列打开的时候才滚动！否则会横向滚动溢出屏幕！
+    if (target && fullyOpen.value) {
         target.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
 }
 
+// 更新播放队列打开状态
+let openTimer: ReturnType<typeof setTimeout> | undefined
+function updateFullyOpenValue() {
+    if (openTimer) {
+        clearTimeout(openTimer)
+    }
+    // Tab 不匹配直接否决
+    if (currentMobileTab.value && currentMobileTab.value !== 'playing') {
+        fullyOpen.value = false
+        return
+    }
+    if (!hidden.value) {
+        openTimer = setTimeout(() => {
+            fullyOpen.value = true
+        }, 500)
+    } else {
+        fullyOpen.value = false
+    }
+}
+
+watch(hidden, () => {
+    updateFullyOpenValue()
+})
+
+watch(currentMobileTab, () => {
+    updateFullyOpenValue()
+})
+
 // 切换曲目时自动定位
 watch(() => queue.value?.current, (newTrack) => {
+    if (manualSwitch.value) return // 手动切换曲目时不会自动定位
     if (newTrack) {
         scrollToQueueTrack(newTrack)
     }
 })
 
 // 打开播放队列时自动定位
-watch(hidden, () => {
-    if (!hidden.value) {
-        setTimeout(() => {
-            if (queue.value?.current) {
-                scrollToQueueTrack(queue.value?.current)
-            }
-        }, 500);
+watch(() => fullyOpen.value, () => {
+    if (fullyOpen.value) {
+        if (queue.value?.current) {
+            scrollToQueueTrack(queue.value?.current)
+        }
     }
 })
 
@@ -47,6 +82,14 @@ function clearQueue() {
     queue.value!.queue = []
     queue.value!.current = undefined
     floatDialogOpen_clearQueue.value = false
+}
+
+// 在队列中手动切换曲目时添加标记
+function markManualSwitch() {
+    manualSwitch.value = true
+    setTimeout(() => {
+        manualSwitch.value = false
+    }, 0)
 }
 
 onMounted(() => {
@@ -66,11 +109,13 @@ onMounted(() => {
     <div class="play-queue-container" :class="{ 'play-queue-container-visible': !hidden }">
         <div class="play-queue">
             <div class="play-queue-header">
-                <div class="play-queue-header-btn" @click="hidden = !hidden">
+                <div class="play-queue-header-btn" :class="{ 'play-queue-header-btn-active': touchPressed === 1 }"
+                    @click="hidden = !hidden" @touchstart="touchPress(1)" @touchend="touchLift()">
                     <img :src="arrowBackIcon">
                 </div>
                 <div class="play-queue-header-title">播放队列（{{ queue?.queue.length }}）</div>
-                <div class="play-queue-header-btn" @click="floatDialogOpen_clearQueue = true">
+                <div class="play-queue-header-btn" :class="{ 'play-queue-header-btn-active': touchPressed === 2 }"
+                    @click="floatDialogOpen_clearQueue = true" @touchstart="touchPress(2)" @touchend="touchLift()">
                     <img :src="deleteSweepIcon">
                 </div>
             </div>
@@ -80,7 +125,7 @@ onMounted(() => {
                 </Transition>
                 <QueueTransition>
                     <PlayQueueItem v-for="track in queue!.queue" :info="track" :key="track.id" v-model:queue="queue"
-                        :queue-track-id="track.id" />
+                        :queue-track-id="track.id" @click="markManualSwitch()" />
                 </QueueTransition>
             </div>
         </div>
@@ -135,7 +180,8 @@ onMounted(() => {
     background: var(--hover-light);
 }
 
-.play-queue-header-btn:active {
+.play-queue-header-btn:active,
+.play-queue-header-btn-active {
     background: var(--active-light);
 }
 
@@ -151,7 +197,7 @@ onMounted(() => {
 .play-queue-list {
     position: relative;
     height: calc(100% - 64px);
-    padding: 8px;
+    padding: 8px 0 8px 8px;
     overflow-y: auto;
     overflow-x: hidden;
 }

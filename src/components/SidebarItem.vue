@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { useTouchOptimize } from './touchOptimize.ts'
+const { pressed: touchPressed, press: touchPress, lift: touchLift } = useTouchOptimize()
+
 const props = withDefaults(
     defineProps<{
         icon?: string,
@@ -10,7 +13,9 @@ const props = withDefaults(
 )
 </script>
 <template>
-    <div class="sidebar-item" :class="{ 'sidebar-item-active': active }">
+    <div class="sidebar-item"
+        :class="{ 'sidebar-item-active': active, 'sidebar-item-touch-active': touchPressed === 1 }"
+        @touchstart="touchPress(1)" @touchend="touchLift()">
         <div class="sidebar-item-icon" v-if="icon">
             <img :src="icon">
         </div>
@@ -33,8 +38,9 @@ const props = withDefaults(
     background: var(--hover-light);
 }
 
-.sidebar-item:active {
-    background: var(--active-light);
+.sidebar-item:active,
+.sidebar-item-touch-active {
+    background: var(--active-light) !important;
 }
 
 .sidebar-item-icon {

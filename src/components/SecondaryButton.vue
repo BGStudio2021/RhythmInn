@@ -1,10 +1,15 @@
 <script setup lang="ts">
+import { useTouchOptimize } from './touchOptimize.ts'
+const { pressed: touchPressed, press: touchPress, lift: touchLift } = useTouchOptimize()
+
 const props = defineProps<{
     icon?: string
 }>()
 </script>
 <template>
-    <button class="secondary-button" :class="{ 'secondary-button-with-icon': icon }">
+    <button class="secondary-button"
+        :class="{ 'secondary-button-with-icon': icon, 'secondary-button-active': touchPressed === 1 }"
+        @touchstart="touchPress(1)" @touchend="touchLift()">
         <img :src="icon" v-if="icon" class="secondary-button-icon">
         <slot></slot>
     </button>
@@ -30,10 +35,12 @@ const props = defineProps<{
     transition-timing-function: var(--easeOutCirc);
 }
 
-.secondary-button:active {
+.secondary-button:active,
+.secondary-button-active {
+    outline: 2px solid var(--border-dark-dynamic);
     background: var(--border-dark-dynamic) !important;
     color: #fff;
-    transition: 0s;
+    transition: 0s !important;
 }
 
 .secondary-button-with-icon {
@@ -47,9 +54,10 @@ const props = defineProps<{
     transition: 1s var(--easeOutCirc);
 }
 
-.secondary-button:active .secondary-button-icon {
+.secondary-button:active .secondary-button-icon,
+.secondary-button-active .secondary-button-icon {
     filter: invert(1);
-    transition: 0s;
+    transition: 0s !important;
 }
 
 .secondary-button:disabled {
@@ -64,7 +72,8 @@ const props = defineProps<{
     color: #fff;
 }
 
-.body-theme-dark .secondary-button:active {
+.body-theme-dark .secondary-button:active,
+.body-theme-dark .secondary-button-active {
     color: #000;
 }
 
@@ -74,7 +83,8 @@ const props = defineProps<{
         color: #fff;
     }
 
-    .body-theme-system .secondary-button:active {
+    .body-theme-system .secondary-button:active,
+    .body-theme-system .secondary-button-active {
         color: #000;
     }
 }

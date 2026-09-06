@@ -2,6 +2,8 @@
 import { inject } from 'vue'
 import clearIcon from '../assets/icons/clear.svg'
 import type { Track, Queue } from './types.ts'
+import { useTouchOptimize } from './touchOptimize.ts'
+const { pressed: touchPressed, press: touchPress, lift: touchLift } = useTouchOptimize()
 
 const props = defineProps<{
     info: Track
@@ -27,12 +29,15 @@ function play() {
 }
 </script>
 <template>
-    <div class="play-queue-item" :class="{ 'play-queue-item-active': info.id === queue?.current?.id }" @click="play()">
+    <div class="play-queue-item"
+        :class="{ 'play-queue-item-active': info.id === queue?.current?.id, 'play-queue-item-touch-active': touchPressed === 1 }"
+        @click="play()" @touchstart="touchPress(1)" @touchend="touchLift()">
         <div style="flex-grow: 1;padding-right: 4px;">
             <div class="play-queue-item-name">{{ info.name }}</div>
             <div class="play-queue-item-artists">{{info.artists.map(({ name }) => name).join(' & ')}}</div>
         </div>
-        <div class="play-queue-item-btn" @click.stop="removeFromQueue()">
+        <div class="play-queue-item-btn" :class="{ 'play-queue-item-btn-touch-active': touchPressed === 2 }"
+            @click.stop="removeFromQueue()" @touchstart.stop="touchPressed = 2" @touchend.stop="touchLift()">
             <img :src="clearIcon">
         </div>
     </div>
@@ -51,8 +56,9 @@ function play() {
     background: var(--hover-light);
 }
 
-.play-queue-item:not(:has(.play-queue-item-btn:active)):active {
-    background: var(--active-light);
+.play-queue-item:not(:has(.play-queue-item-btn:active)):active,
+.play-queue-item-touch-active {
+    background: var(--active-light) !important;
 }
 
 .play-queue-item-active {
@@ -80,7 +86,8 @@ function play() {
     background: var(--hover-light);
 }
 
-.play-queue-item-btn:active {
+.play-queue-item-btn:active,
+.play-queue-item-btn-touch-active {
     background: var(--active-light);
 }
 

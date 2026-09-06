@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import { useTouchOptimize } from './touchOptimize.ts'
+const { pressed: touchPressed, press: touchPress, lift: touchLift } = useTouchOptimize()
+
 const props = defineProps<{
     icon: string
 }>()
 </script>
 <template>
-    <button class="transparent-icon-button">
+    <button class="transparent-icon-button" :class="{ 'transparent-icon-button-active': touchPressed === 1 }"
+        @touchstart="touchPress(1)" @touchend="touchLift()">
         <img :src="icon">
     </button>
 </template>
@@ -24,10 +28,12 @@ const props = defineProps<{
     transition: background 1s var(--easeOutCirc);
 }
 
-.transparent-icon-button:active {
+.transparent-icon-button:active,
+.transparent-icon-button-active {
+    outline: 2px solid var(--border-dark-dynamic);
     background: var(--border-dark-dynamic);
     color: #fff;
-    transition: 0s;
+    transition: 0s !important;
 }
 
 .transparent-icon-button img {
@@ -37,9 +43,10 @@ const props = defineProps<{
     transition: 1s var(--easeOutCirc);
 }
 
-.transparent-icon-button:active img {
+.transparent-icon-button:active img,
+.transparent-icon-button-active img {
     filter: invert(1);
-    transition: 0s;
+    transition: 0s !important;
 }
 
 .transparent-icon-button:disabled {
@@ -53,7 +60,8 @@ const props = defineProps<{
     filter: invert(1);
 }
 
-.body-theme-dark .transparent-icon-button:active img {
+.body-theme-dark .transparent-icon-button:active img,
+.body-theme-dark .transparent-icon-button-active img {
     filter: none;
 }
 
@@ -62,7 +70,8 @@ const props = defineProps<{
         filter: invert(1);
     }
 
-    .body-theme-system .transparent-icon-button:active img {
+    .body-theme-system .transparent-icon-button:active img,
+    .body-theme-system .transparent-icon-button-active img {
         filter: none;
     }
 }

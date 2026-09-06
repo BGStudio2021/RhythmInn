@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { useTouchOptimize } from './touchOptimize.ts'
+const { pressed: touchPressed, press: touchPress, lift: touchLift } = useTouchOptimize()
+
 const props = withDefaults(
     defineProps<{
         icon?: string,
@@ -10,7 +13,9 @@ const props = withDefaults(
 )
 </script>
 <template>
-    <button class="secondary-icon-button" :class="{ 'secondary-icon-button-small': iconSize === 'small' }">
+    <button class="secondary-icon-button"
+        :class="{ 'secondary-icon-button-small': iconSize === 'small', 'secondary-icon-button-active': touchPressed === 1 }"
+        @touchstart="touchPress(1)" @touchend="touchLift()">
         <img :src="icon" v-if="icon">
         <slot></slot>
     </button>
@@ -32,10 +37,11 @@ const props = withDefaults(
         color 1s var(--easeOutCirc);
 }
 
-.secondary-icon-button:active {
+.secondary-icon-button:active,
+.secondary-icon-button-active {
     background: var(--border-dark-dynamic) !important;
     color: #fff;
-    transition: 0s;
+    transition: 0s !important;
 }
 
 .secondary-icon-button-small {
@@ -54,9 +60,10 @@ const props = withDefaults(
     height: 24px;
 }
 
-.secondary-icon-button:active img {
+.secondary-icon-button:active img,
+.secondary-icon-button-active img {
     filter: invert(1);
-    transition: 0s;
+    transition: 0s !important;
 }
 
 .secondary-icon-button:disabled {
@@ -71,7 +78,8 @@ const props = withDefaults(
     color: #fff;
 }
 
-.body-theme-dark .secondary-icon-button:active {
+.body-theme-dark .secondary-icon-button:active,
+.body-theme-dark .secondary-icon-button-active {
     color: #000;
 }
 
@@ -79,7 +87,8 @@ const props = withDefaults(
     filter: invert(1);
 }
 
-.body-theme-dark .secondary-icon-button:active img {
+.body-theme-dark .secondary-icon-button:active img,
+.body-theme-dark .secondary-icon-button-active img {
     filter: none;
 }
 
@@ -89,7 +98,8 @@ const props = withDefaults(
         color: #fff;
     }
 
-    .body-theme-system .secondary-icon-button:active {
+    .body-theme-system .secondary-icon-button:active,
+    .body-theme-system .secondary-icon-button-active {
         color: #000;
     }
 
@@ -97,7 +107,8 @@ const props = withDefaults(
         filter: invert(1);
     }
 
-    .body-theme-system .secondary-icon-button:active img {
+    .body-theme-system .secondary-icon-button:active img,
+    .body-theme-system .secondary-icon-button-active img {
         filter: none;
     }
 }

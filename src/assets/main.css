@@ -80,6 +80,11 @@
   }
 }
 
+@font-face {
+  font-family: 'Segoe UI Variable';
+  src: url('SegUIVar.ttf') format('truetype');
+}
+
 * {
   user-select: none;
 }

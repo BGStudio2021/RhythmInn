@@ -20,6 +20,8 @@ import { processDuration } from '../components/processDuration.ts'
 import volumeUpIcon from '../assets/icons/volume_up.svg'
 import BackgroundTransition from './BackgroundTransition.vue'
 import { settings } from './settings.ts'
+import shareIcon from '../assets/icons/share.svg'
+import { copyText } from './copyText.ts'
 
 const showToast = inject<(msg: string) => void>('showToast')
 const hideQueue = ref(true)
@@ -28,6 +30,7 @@ const audioRef = ref()
 const playStatus = ref({ paused: true, duration: 0, currentTime: 0 })
 const timeStr = ref({ current: '00:00', full: '00:00' })
 const volume = ref(1)
+const currentMobileTab = defineModel('currentMobileTab') // 移动选项卡
 
 // 播放模式（顺序）
 const playModeList = [
@@ -56,7 +59,7 @@ async function playPause() {
         try {
             await audio.play()
         } catch (error) {
-            if (showToast) showToast('TAT 播放出错')
+            if (showToast) showToast('TAT\n播放出错，可能的原因：\n1. 正在播放的是 VIP 曲目\n2. 音频还未加载完成')
             console.error(error)
             playStatus.value.paused = true
         }
@@ -99,6 +102,8 @@ function randomPlay() {
 // 切换曲目更新自动暂停状态
 watch(() => queue.value?.current?.id, () => {
     playStatus.value.paused = true
+    timeStr.value.full = '00:00'
+    playStatus.value.duration = 0
 })
 
 // 调整进度
@@ -134,6 +139,12 @@ function updateMediaMetadata(currentTrack: Track | undefined) {
             }]
         })
     }
+}
+
+// 分享曲目
+function shareTrack() {
+    copyText(`分享 ${queue.value?.current?.artists.map(({ name }) => name).join(' & ')} 的单曲《${queue.value?.current?.name}》：https://music.163.com/song?id=${queue.value?.current?.id}`)
+    if (showToast) showToast('已复制到剪贴板')
 }
 
 onMounted(() => {
@@ -179,6 +190,8 @@ onMounted(() => {
 </script>
 <template>
     <div class="playing-container">
+        <TransparentIconButton :icon="shareIcon" class="track-share-btn" @click="shareTrack()"
+            :disabled="!queue?.current" />
         <div class="track-info-area">
             <div class="track-cover">
                 <div class="track-cover-img-container">
@@ -191,7 +204,7 @@ onMounted(() => {
             <div class="track-name-container">
                 <NameTransition>
                     <div :key="queue?.current ? queue?.current.id : -1"
-                        style="position: absolute;width: 100%;display: flex;flex-direction: column;align-items: center;">
+                        style="position: absolute;width: 100%;display: flex;flex-direction: column;align-items: center;gap: 4px;">
                         <div class="track-name">{{ queue?.current ?
                             queue.current.name : 'RhythmInn' }}</div>
                         <div class="track-artists">{{queue?.current ? queue.current.artists.map(({ name }) => name)
@@ -231,7 +244,7 @@ onMounted(() => {
             </div>
         </div>
     </div>
-    <PlayQueue v-model:hidden="hideQueue" v-model:queue="queue" />
+    <PlayQueue v-model:hidden="hideQueue" v-model:queue="queue" v-model:current-mobile-tab="currentMobileTab" />
     <BackgroundTransition>
         <div class="player-background" :key="queue?.current ? queue?.current.id : -1"
             v-if="settings?.playerBg === 'on'">
@@ -251,6 +264,12 @@ onMounted(() => {
     height: 100%;
     display: flex;
     flex-direction: column;
+}
+
+.track-share-btn {
+    position: absolute;
+    right: 8px;
+    top: 8px;
 }
 
 .track-info-area {
@@ -289,7 +308,7 @@ onMounted(() => {
 }
 
 .track-artists {
-    font-size: 16px;
+    font-size: 14px;
     opacity: 0.8;
 }
 
@@ -322,7 +341,19 @@ onMounted(() => {
     filter: blur(32px);
 }
 
+
+@media screen and (max-width:720px) {
+    .track-info-area {
+        margin-top: 75px;
+    }
+
+    .media-control-area {
+        margin-bottom: 37.5px;
+    }
+}
+
 /* 深色主题 */
+
 .body-theme-dark .volume-area img {
     filter: invert(1);
 }

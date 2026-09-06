@@ -1,12 +1,28 @@
-<script setup lang="ts">const value = defineModel()
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const value = defineModel()
 const emit = defineEmits(['input'])
+const sliderRef = ref()
 
 function handleInput(e: InputEvent) {
     emit('input', e)
 }
+
+// 触摸屏优化（单独版本）
+function touchPress() {
+    sliderRef.value.classList.add('slider-active')
+}
+
+function touchLift() {
+    setTimeout(() => {
+        sliderRef.value.classList.remove('slider-active')
+    }, 100)
+}
 </script>
 <template>
-    <input type="range" class="slider" :value @input="handleInput">
+    <input type="range" class="slider" @touchstart="touchPress" @touchend="touchLift" :value @input="handleInput"
+        ref="sliderRef">
 </template>
 <style scoped>
 .slider {
@@ -41,11 +57,13 @@ function handleInput(e: InputEvent) {
     background: var(--indigo-300);
 }
 
-.slider:active::-webkit-slider-thumb {
-    background: #000;
+.slider:active::-webkit-slider-thumb,
+.slider-active::-webkit-slider-thumb {
+    background: #000 !important;
 }
 
 /* 深色主题 */
+
 .body-theme-dark .slider::-webkit-slider-runnable-track {
     background: rgba(255, 255, 255, 0.2);
 }
@@ -59,8 +77,9 @@ function handleInput(e: InputEvent) {
     background: var(--indigo-200);
 }
 
-.body-theme-dark .slider:active::-webkit-slider-thumb {
-    background: #fff;
+.body-theme-dark .slider:active::-webkit-slider-thumb,
+.body-theme-dark .slider-active::-webkit-slider-thumb {
+    background: #fff !important;
 }
 
 @media(prefers-color-scheme: dark) {
@@ -77,8 +96,9 @@ function handleInput(e: InputEvent) {
         background: var(--indigo-200);
     }
 
-    .body-theme-system .slider:active::-webkit-slider-thumb {
-        background: #fff;
+    .body-theme-system .slider:active::-webkit-slider-thumb,
+    .body-theme-system .slider-active::-webkit-slider-thumb {
+        background: #fff !important;
     }
 }
 </style>

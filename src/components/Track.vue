@@ -5,6 +5,8 @@ import { inject, ref } from 'vue'
 import SecondaryButton from './SecondaryButton.vue'
 import type { Track, Queue } from './types.ts'
 import { processDuration } from './processDuration.ts'
+import { useTouchOptimize } from './touchOptimize.ts'
+const { pressed: touchPressed, press: touchPress, lift: touchLift } = useTouchOptimize()
 
 const props = defineProps<{
     number: number
@@ -16,12 +18,13 @@ const addToQueue = inject<(track: Track, options?: {}) => void>('addToQueue')
 
 // 打开单曲页面
 function openTrackPage(id: number) {
-    location.href = `https://music.163.com/song?id=${id}`
+    window.open(`https://music.163.com/song?id=${id}`, '_blank')
 }
 </script>
 <template>
     <div class="track" @click="addToQueue ? addToQueue(info, { toast: false, playNow: true }) : undefined"
-        :class="{ 'track-active': queue?.current?.id === info.id }">
+        :class="{ 'track-active': queue?.current?.id === info.id, 'track-touch-active': touchPressed === 1 }"
+        @touchstart="touchPress(1)" @touchend="touchLift()">
         <div class="track-content-regular">
             <div class="track-number">{{ number }}</div>
             <img class="track-cover" :src="info.album.cover">
@@ -29,10 +32,13 @@ function openTrackPage(id: number) {
                 <div class="track-name">{{ info.name }}</div>
                 <div class="track-artist">{{info.artists.map(({ name }) => name).join(' & ')}}</div>
             </div>
-            <div class="track-btn" @click.stop="addToQueue ? addToQueue(info) : undefined">
+            <div class="track-btn" :class="{ 'track-btn-active': touchPressed === 2 }"
+                @click.stop="addToQueue ? addToQueue(info) : undefined" @touchstart.stop="touchPress(2)"
+                @touchend.stop="touchLift()">
                 <img :src="playlistAddIcon">
             </div>
-            <div class="track-btn" @click.stop="unfolded = !unfolded">
+            <div class="track-btn" :class="{ 'track-btn-active': touchPressed === 3 }"
+                @click.stop="unfolded = !unfolded" @touchstart.stop="touchPress(3)" @touchend.stop="touchLift()">
                 <img :src="infoIcon">
             </div>
         </div>
@@ -41,7 +47,8 @@ function openTrackPage(id: number) {
                 专辑：{{ info.album.name }}<br>
                 时长：{{ processDuration(info.duration) }}
                 <div>
-                    <SecondaryButton @click="openTrackPage(info.id)" style="float: right;">打开单曲页面</SecondaryButton>
+                    <SecondaryButton @click="openTrackPage(info.id)" style="float: right;" @touchstart.stop
+                        @touchend.stop>打开单曲页面</SecondaryButton>
                 </div>
             </div>
         </div>
@@ -53,7 +60,7 @@ function openTrackPage(id: number) {
     flex-direction: column;
     margin: 0 16px;
     padding: 8px 8px 8px 0;
-    width: calc(100% - 40px);
+    width: calc(100% - 32px);
 }
 
 .track-content-regular {
@@ -66,8 +73,9 @@ function openTrackPage(id: number) {
     background: var(--hover-dark-dynamic);
 }
 
-.track:not(:has(.track-btn:active)):not(:has(.secondary-button:active)):active {
-    background: var(--active-dark-dynamic);
+.track:not(:has(.track-btn:active)):not(:has(.secondary-button:active)):active,
+.track-touch-active {
+    background: var(--active-dark-dynamic) !important;
 }
 
 .track-active {
@@ -78,8 +86,9 @@ function openTrackPage(id: number) {
     background: var(--indigo-100);
 }
 
-.track-active:not(:has(.track-btn:active)):not(:has(.secondary-button:active)):active {
-    background: var(--indigo-200);
+.track-active:not(:has(.track-btn:active)):not(:has(.secondary-button:active)):active,
+.track-active.track-touch-active {
+    background: var(--indigo-200) !important;
 }
 
 .track-number {
@@ -127,8 +136,9 @@ function openTrackPage(id: number) {
     background: var(--hover-dark-dynamic);
 }
 
-.track-btn:active {
-    background: var(--active-dark-dynamic);
+.track-btn:active,
+.track-btn-active {
+    background: var(--active-dark-dynamic) !important;
 }
 
 .track-btn img {
@@ -155,6 +165,29 @@ function openTrackPage(id: number) {
     transform: scale(1);
 }
 
+@media screen and (max-width:720px) {
+    .track {
+        margin: 0 12px;
+        width: calc(100% - 24px);
+    }
+
+    .track-number {
+        font-size: 15px;
+    }
+
+    .track-name {
+        font-size: 15px;
+    }
+
+    .track-artist {
+        font-size: 13px;
+    }
+
+    .track-content-detailed {
+        font-size: 15px;
+    }
+}
+
 /* 深色主题 */
 
 .body-theme-dark .track-active {
@@ -165,8 +198,9 @@ function openTrackPage(id: number) {
     background: rgba(63, 81, 181, 0.5);
 }
 
-.body-theme-dark .track-active:not(:has(.track-btn:active)):not(:has(.secondary-button:active)):active {
-    background: rgba(92, 107, 192, 0.5);
+.body-theme-dark .track-active:not(:has(.track-btn:active)):not(:has(.secondary-button:active)):active,
+.body-theme-dark .track-active.track-touch-active {
+    background: rgba(92, 107, 192, 0.5) !important;
 }
 
 .body-theme-dark .track-btn img {
@@ -182,8 +216,9 @@ function openTrackPage(id: number) {
         background: rgba(63, 81, 181, 0.5);
     }
 
-    .body-theme-system .track-active:not(:has(.track-btn:active)):not(:has(.secondary-button:active)):active {
-        background: rgba(92, 107, 192, 0.5);
+    .body-theme-system .track-active:not(:has(.track-btn:active)):not(:has(.secondary-button:active)):active,
+    .body-theme-system .track-active.track-touch-active {
+        background: rgba(92, 107, 192, 0.5) !important;
     }
 
     .body-theme-system .track-btn img {

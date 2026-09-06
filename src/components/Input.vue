@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import clearIcon from '../assets/icons/clear.svg'
+import { useTouchOptimize } from './touchOptimize.ts'
+const { pressed: touchPressed, press: touchPress, lift: touchLift } = useTouchOptimize()
 
 const props = withDefaults(
     defineProps<{
@@ -30,8 +32,8 @@ function clearInput() {
 </script>
 <template>
     <div class="input-container">
-        <input :type="type" class="input" :class="{ 'input-with-icon': icon }" :placeholder="placeholder" ref="input"
-            v-model="text">
+        <input :type="type" class="input" :class="{ 'input-with-icon': icon, 'input-active': touchPressed === 1 }"
+            :placeholder="placeholder" ref="input" v-model="text" @touchstart="touchPress(1)" @touchend="touchLift()">
         <div class="input-icon" v-if="icon">
             <img :src="icon">
         </div>
@@ -57,7 +59,8 @@ function clearInput() {
     transition: padding 0.3s var(--easeOutCirc);
 }
 
-.input:hover {
+.input:hover,
+.input-active {
     border: 2px solid var(--border-dark-dynamic) !important;
 }
 

@@ -27,6 +27,7 @@ const SearchBar = ref()
 const contentAreaRef = ref()
 const showToast = inject<(msg: string) => void>('showToast')
 const locateBtnDisabled = ref(true) // 定位按钮禁用状态
+const searchBarFocusMark = defineModel('searchBarFocusMark') // 搜索框聚焦状态标记（只要数值变化就聚焦）
 // 页码按钮显示状态
 const paginationVisible = computed(() => {
     if (props.currentTab.indexOf('all') !== -1 || props.currentTab.indexOf('artist') !== -1) {
@@ -50,16 +51,23 @@ const playlistSlice = computed(() => {
         return playlist.value
     }
 })
+// 移动选项卡
+const currentMobileTab = defineModel('currentMobileTab')
 
-// 自动聚焦搜索框
-watch(() => props.currentTab, async () => {
-    if (props.currentTab === 'search') {
-        searchKeywords.value = ''
-        playlist.value = []
-        await nextTick()
+// 自动聚焦搜索框，同时清空搜索内容
+watch(() => searchBarFocusMark.value, initSearchBar)
+
+function initSearchBar() {
+    // Tab 不匹配时跳过
+    if (currentMobileTab.value && currentMobileTab.value !== 'playlist') return
+    if (props.currentTab !== 'search') return
+    searchKeywords.value = ''
+    playlist.value = []
+    setTimeout(() => {
         SearchBar.value.focus()
-    }
-})
+    }, currentMobileTab.value ? 500 : 0)
+
+}
 
 // 搜索
 watch(searchKeywords, (value) => {
@@ -155,7 +163,7 @@ watch(() => currentPage.value, () => {
         <div class="playlist-container" :key="currentTab">
             <div class="title-area">
                 <div style="display: flex;">
-                    <div style="display: flex;flex-direction: column;flex-grow: 1;">
+                    <div style="display: flex;flex-direction: column;flex-grow: 1;justify-content: center;">
                         <div class="title">{{ title }}</div>
                         <div class="subtitle">{{ subtitle }}</div>
                     </div>
@@ -163,11 +171,12 @@ watch(() => currentPage.value, () => {
                         <SecondaryIconButton :icon="myLocationIcon" style="margin-right: 8px;" icon-size="small"
                             @click="scrollToCurrentTrack()" :disabled="locateBtnDisabled">
                         </SecondaryIconButton>
-                        <PrimaryIconButton :icon="playArrowIcon" @click="playAll()" :disabled="!playlist?.length">
+                        <PrimaryIconButton :icon="playArrowIcon" @click="playAll(); currentMobileTab = 'playing'"
+                            :disabled="!playlist?.length">
                         </PrimaryIconButton>
                     </div>
                 </div>
-                <div style="width: 100%;height: 16px;" v-if="subtitle"></div>
+                <div class="title-area-margin-bottom" v-if="subtitle"></div>
                 <Input v-model="searchKeywords" v-if="currentTab === 'search'" style="width: 100%;"
                     :placeholder="'音乐标题 / 作者 / 专辑'" :icon="searchIcon" ref="SearchBar" />
                 <Pagination v-if="paginationVisible" v-model:playlist="playlist" v-model:current-page="currentPage" />
@@ -179,7 +188,7 @@ watch(() => currentPage.value, () => {
                 <div v-if="currentTab !== 'settings'">
                     <div class="playlist">
                         <TrackComponent v-for="(track, index) in playlistSlice" :number="index + 1" :info="track"
-                            v-model:queue="queue" :playlist-track-id="track.id" />
+                            v-model:queue="queue" :playlist-track-id="track.id" @click="currentMobileTab = 'playing'" />
                     </div>
                 </div>
             </div>
@@ -200,10 +209,9 @@ watch(() => currentPage.value, () => {
 
 .title-area {
     top: 0;
-    width: calc(100% - 40px);
+    width: calc(100% - 32px);
     padding: 32px 16px 16px 16px;
-    margin: 0 24px 0 16px;
-    /* 右边多出 8px 给滚动条腾出空间，方便对齐 */
+    margin: 0 16px;
     box-sizing: border-box;
     background: var(--indigo-background);
     z-index: 1;
@@ -217,6 +225,11 @@ watch(() => currentPage.value, () => {
 .subtitle {
     font-size: 16px;
     opacity: 0.8;
+}
+
+.title-area-margin-bottom {
+    width: 100%;
+    height: 16px;
 }
 
 .content-area {
@@ -244,5 +257,24 @@ watch(() => currentPage.value, () => {
 
 .content-area::-webkit-scrollbar-thumb:active {
     background: var(--active-darker-dynamic);
+}
+
+@media screen and (max-width:720px) {
+    .title-area {
+        padding: 24px 12px 12px 12px;
+    }
+
+    .title {
+        font-size: 21px;
+        margin-bottom: 4px;
+    }
+
+    .subtitle {
+        font-size: 14px;
+    }
+
+    .title-area-margin-bottom {
+        height: 8px;
+    }
 }
 </style>
