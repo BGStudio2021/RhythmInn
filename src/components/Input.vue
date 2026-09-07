@@ -37,7 +37,8 @@ function clearInput() {
         <div class="input-icon" v-if="icon">
             <img :src="icon">
         </div>
-        <div class="input-clear-btn" @click="clearInput()">
+        <div class="input-clear-btn" :class="{ 'input-clear-btn-active': touchPressed === 2 }" @click="clearInput()"
+            @touchstart="touchPress(2)" @touchend="touchLift()">
             <img :src="clearIcon">
         </div>
     </div>
@@ -138,8 +139,9 @@ function clearInput() {
     background: var(--hover-dark-dynamic);
 }
 
-.input-clear-btn:active {
-    background: var(--active-dark-dynamic);
+.input-clear-btn:active,
+.input-clear-btn-active {
+    background: var(--active-dark-dynamic) !important;
 }
 
 .input-clear-btn img {

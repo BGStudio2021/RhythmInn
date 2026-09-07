@@ -108,7 +108,7 @@ onMounted(() => {
 @media screen and (max-width:720px) {
     .title-area img {
         width: 40%;
-        margin: 12px 0 8px 0;
+        margin: 18px 0 12px 0;
     }
 }
 </style>

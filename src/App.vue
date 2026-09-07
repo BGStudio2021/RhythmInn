@@ -128,11 +128,13 @@ provide('registerMethod', registerMethod)
 .playlist {
   position: relative;
   width: 50%;
+  background: var(--indigo-background);
 }
 
 .playing {
   position: relative;
   width: 30%;
+  background: var(--indigo-background);
 }
 
 .container-mobile {
@@ -171,11 +173,13 @@ provide('registerMethod', registerMethod)
   position: relative;
   width: 100%;
   height: 100%;
+  background: var(--indigo-background);
 }
 
 .playing-mobile {
   position: relative;
   width: 100%;
   height: 100%;
+  background: var(--indigo-background);
 }
 </style>

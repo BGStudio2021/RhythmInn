@@ -204,7 +204,7 @@ onMounted(() => {
             <div class="track-name-container">
                 <NameTransition>
                     <div :key="queue?.current ? queue?.current.id : -1"
-                        style="position: absolute;width: 100%;display: flex;flex-direction: column;align-items: center;gap: 4px;">
+                        style="position: absolute;width: calc(100% - 32px);margin: 0 16px;display: flex;flex-direction: column;align-items: center;gap: 4px;">
                         <div class="track-name">{{ queue?.current ?
                             queue.current.name : 'RhythmInn' }}</div>
                         <div class="track-artists">{{queue?.current ? queue.current.artists.map(({ name }) => name)
