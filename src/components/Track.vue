@@ -61,6 +61,7 @@ function openTrackPage(id: number) {
     margin: 0 16px;
     padding: 8px 8px 8px 0;
     width: calc(100% - 32px);
+    box-sizing: border-box;
 }
 
 .track-content-regular {

@@ -197,7 +197,7 @@ onMounted(() => {
 .play-queue-list {
     position: relative;
     height: calc(100% - 64px);
-    padding: 8px 0 8px 8px;
+    padding: 8px;
     overflow-y: auto;
     overflow-x: hidden;
 }
