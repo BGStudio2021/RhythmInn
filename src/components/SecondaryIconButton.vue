@@ -52,12 +52,15 @@ const props = withDefaults(
     width: 28px;
     height: 28px;
     opacity: 0.8;
-    transition: 1s var(--easeOutCirc);
 }
 
 .secondary-icon-button-small img {
     width: 24px;
     height: 24px;
+}
+
+.secondary-icon-button:hover img {
+    transition: 1s var(--easeOutCirc);
 }
 
 .secondary-icon-button:active img,

@@ -55,12 +55,15 @@ const props = withDefaults(
     height: 28px;
     opacity: 0.8;
     filter: invert(1);
-    transition: 1s var(--easeOutCirc);
 }
 
 .primary-icon-button-small img {
     width: 24px;
     height: 24px;
+}
+
+.primary-icon-button:hover img {
+    transition: 1s var(--easeOutCirc);
 }
 
 .primary-icon-button:active img,

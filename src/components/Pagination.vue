@@ -17,7 +17,7 @@ const totalPages = computed(() => {
         <component v-for="pageNum in totalPages" @click="currentPage = pageNum"
             :is="(currentPage === pageNum) ? PrimaryIconButton : SecondaryIconButton" style="margin:2px 4px;">
             <div style="width: 24px;height: 24px;display: flex;justify-content: center;align-items: center;">{{ pageNum
-            }}</div>
+                }}</div>
         </component>
     </div>
 </template>
@@ -33,14 +33,14 @@ const totalPages = computed(() => {
 }
 
 .pagination-container::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.25);
+    background: var(--hover-dark-dynamic);
 }
 
 .pagination-container::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.35);
+    background: var(--active-dark-dynamic);
 }
 
 .pagination-container::-webkit-scrollbar-thumb:active {
-    background: rgba(255, 255, 255, 0.45);
+    background: var(--active-darker-dynamic);
 }
 </style>

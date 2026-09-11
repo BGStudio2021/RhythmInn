@@ -40,6 +40,9 @@ const props = defineProps<{
     width: 28px;
     height: 28px;
     opacity: 0.8;
+}
+
+.transparent-icon-button:hover img {
     transition: 1s var(--easeOutCirc);
 }
 
