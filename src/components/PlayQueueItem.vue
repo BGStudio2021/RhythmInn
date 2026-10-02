@@ -88,7 +88,7 @@ function play() {
 
 .play-queue-item-btn:active,
 .play-queue-item-btn-touch-active {
-    background: var(--active-light);
+    background: var(--active-light) !important;
 }
 
 .play-queue-item-btn img {

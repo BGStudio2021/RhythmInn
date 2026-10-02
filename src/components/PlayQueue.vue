@@ -182,7 +182,7 @@ onMounted(() => {
 
 .play-queue-header-btn:active,
 .play-queue-header-btn-active {
-    background: var(--active-light);
+    background: var(--active-light) !important;
 }
 
 .play-queue-header-title {
